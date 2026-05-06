@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rural Task AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = 'login.html';
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Rural Task AI</h1>
+                <p>A real-world, trust-based workforce platform with explainable decisions</p>
+            </div>
+            <div style="text-align: right;">
+                <span id="user-display" style="font-weight: bold; color: var(--primary);"></span><br>
+                <button onclick="logout()" class="secondary"
+                    style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.8rem; margin-top: 0.5rem;">Logout</button>
+            </div>
+        </header>
+
+        <!-- Insights Dashboard -->
+        <section id="insights-section" style="margin-bottom: 2rem; background: rgba(99, 102, 241, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>📊 Platform Insights</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="refreshBtn" class="secondary" style="width: auto; padding: 0.5rem 1rem;">Refresh
+                        Stats</button>
+                    <button id="notifyBtn" class="secondary" style="width: auto; padding: 0.5rem 1rem;">Send
+                        Notification</button>
+                    <button id="resetDemoBtn" class="secondary"
+                        style="width: auto; padding: 0.5rem 1rem; border-color: var(--warning); color: var(--warning);">Reset
+                        Jobs</button>
+                    <button id="freshStartBtn" class="secondary"
+                        style="width: auto; padding: 0.5rem 1rem; border-color: var(--danger); color: var(--danger);">Fresh
+                        Start Demo</button>
+                </div>
+            </div>
+            <div class="grid" id="insights-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <!-- Stats cards populated here -->
+            </div>
+        </section>
+
+        <div class="grid">
+            <!-- 1. ADD WORKER -->
+            <section id="add-worker-section">
+                <h2>👤 Add Worker</h2>
+                <form id="worker-form">
+                    <div class="form-group">
+                        <label for="workerName">Name</label>
+                        <input type="text" id="workerName" placeholder="e.g. Ramesh Kumar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workerSkills">Skills (comma separated)</label>
+                        <input type="text" id="workerSkills" placeholder="e.g. Farming, Welding, Driving" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workerLocation">Location</label>
+                        <input type="text" id="workerLocation" placeholder="e.g. Village A" required>
+                    </div>
+                    <button type="button" onclick="addWorker()">Register Worker</button>
+                </form>
+
+                <div class="list-container" id="workers-list">
+                    <!-- Workers populated here -->
+                </div>
+            </section>
+
+            <!-- 2. VERIFY SKILL -->
+            <section id="verify-skill-section">
+                <h2>✅ Micro Skill Verification</h2>
+                <form id="verify-form">
+                    <div class="form-group">
+                        <label for="workerSelect">Worker</label>
+                        <select id="workerSelect" required>
+                            <option value="">Select Worker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillSelect">Skill</label>
+                        <select id="skillSelect" required>
+                            <option value="">Select Skill</option>
+                        </select>
+                    </div>
+                    <div class="actions">
+                        <button type="button" id="startQuizBtn" class="success" style="width: 100%;"
+                            onclick="openSkillQuiz()">Start Skill Verification Quiz</button>
+                    </div>
+                </form>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+                    * Increases/decreases skill confidence based on outcome.
+                </p>
+            </section>
+
+            <!-- 3. POST JOB -->
+            <section id="post-job-section">
+                <h2>💼 Post New Job</h2>
+                <form id="job-form">
+                    <div class="form-group">
+                        <label for="job-title">Job Title</label>
+                        <input type="text" id="job-title" placeholder="e.g. Tractor Repair" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-skills">Required Skills (skill:priority, ...)</label>
+                        <input type="text" id="job-skills" placeholder="e.g. Welding:3, Mechanics:1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-location">Location</label>
+                        <input type="text" id="job-location" placeholder="e.g. Village A" required>
+                    </div>
+                    <button type="submit">Post & Match Job</button>
+                </form>
+            </section>
+
+            <!-- 4. ACTIVE JOBS -->
+            <section id="jobs-section" style="grid-column: 1 / -1;">
+                <h2>⚡ Active Jobs & Engine Decisions</h2>
+                <div class="list-container grid" id="jobs-list"
+                    style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+                    <!-- Jobs populated here -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <h3>⭐ Job Feedback</h3>
+            <div class="form-group">
+                <label>Rating (1-5)</label>
+                <input type="number" id="feedback-rating" min="1" max="5" value="5">
+            </div>
+            <div class="form-group">
+                <label>Comment</label>
+                <textarea id="feedback-comment" placeholder="Great work!"></textarea>
+            </div>
+            <div class="actions">
+                <button id="submit-feedback">Submit & Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="failure-modal" class="modal">
+        <div class="modal-content">
+            <h3>❗ Reason for Failure</h3>
+            <div class="form-group">
+                <label>Select Reason</label>
+                <select id="failure-reason">
+                    <option value="Skill mismatch">Skill mismatch</option>
+                    <option value="No show">No show</option>
+                    <option value="Delay">Delay</option>
+                    <option value="Equipment failure">Equipment failure</option>
+                </select>
+            </div>
+            <div class="actions">
+                <button class="danger" id="submit-failure">Report Failure</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3>📝 Skill Verification Quiz</h3>
+            <p id="quiz-skill-title" style="font-weight: bold; color: var(--primary);"></p>
+            <div id="quiz-questions">
+                <!-- Questions injected here -->
+            </div>
+            <div class="quiz-footer" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <button id="submitQuizBtn">Submit Quiz</button>
+                    <button id="closeQuizBtn" class="secondary">Cancel</button>
+                </div>
+                <button id="generateAiQuizBtn" class="secondary" style="border-color: #6366f1; color: #6366f1;">🤖 Generate AI Questions</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast for feedback -->
+    <div id="toast">Assignment reassigned successfully!</div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

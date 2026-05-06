@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Rural Task AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page" style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+    <div class="login-card" style="max-width: 400px; width: 100%;">
+        <section>
+            <h2 style="text-align: center;">🚀 Join Rural Task AI</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="role" required>
+                        <option value="worker">Worker</option>
+                        <option value="employer">Employer</option>
+                    </select>
+                </div>
+                <button type="submit" style="width: 100%;">Sign Up</button>
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+                    Already have an account? <a href="login.html" style="color: var(--primary);">Login</a>
+                </p>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        document.getElementById('signup-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            try {
+                const res = await fetch('http://localhost:3000/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert('Signup successful! Please login.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Could not connect to server. Ensure you are accessing via http://localhost:3000 and the server is running.');
+            }
+        };
+    </script>
+</body>
+</html>

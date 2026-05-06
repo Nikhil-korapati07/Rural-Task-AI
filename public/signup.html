@@ -42,7 +42,7 @@
             const role = document.getElementById('role').value;
 
             try {
-                const res = await fetch('http://localhost:3000/auth/signup', {
+                const res = await fetch('/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, role })
@@ -56,7 +56,7 @@
                     alert('Error: ' + data.error);
                 }
             } catch (err) {
-                alert('Could not connect to server. Ensure you are accessing via http://localhost:3000 and the server is running.');
+                alert('Could not connect to server. Ensure the backend is available and you are loading the app from the same origin.');
             }
         };
     </script>

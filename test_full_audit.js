@@ -1,11 +1,20 @@
 const http = require('http');
 
+const BASE_URL = process.env.BASE_URL;
+if (!BASE_URL) {
+  throw new Error('Please set BASE_URL to the server URL before running the audit, e.g. BASE_URL=https://your-app-domain.com');
+}
+const baseUrl = new URL(BASE_URL);
+const API_HOST = baseUrl.hostname;
+const API_PORT = baseUrl.port || (baseUrl.protocol === 'https:' ? '443' : '80');
+const PATH_PREFIX = baseUrl.pathname.replace(/\/$/, '');
+
 async function request(path, method = 'GET', body = null) {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'localhost',
-      port: 3000,
-      path: path,
+      hostname: API_HOST,
+      port: API_PORT,
+      path: `${PATH_PREFIX}${path}`,
       method: method,
       headers: { 'Content-Type': 'application/json' }
     };

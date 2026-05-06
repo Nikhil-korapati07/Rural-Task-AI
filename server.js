@@ -27,7 +27,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ---- MongoDB Connection ----
-mongoose.connect('mongodb://127.0.0.1:27017/rural-task-ai')
+const MONGO_URI = process.env.MONGODB_URI;
+if (!MONGO_URI) {
+  throw new Error('MONGODB_URI must be set before starting the server.');
+}
+mongoose.connect(MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected Successfully");
     console.log("📡 Persistence Layer: ACTIVE");
@@ -235,6 +239,6 @@ app.post("/reset-all", asyncHandler(async (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n=========================================`);
   console.log(`  Rural Task AI — Persistent Engine`);
-  console.log(`  Server running on http://localhost:${PORT}`);
+  console.log(`  Server running on port ${PORT}`);
   console.log(`=========================================\n`);
 });

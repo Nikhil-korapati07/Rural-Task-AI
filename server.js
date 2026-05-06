@@ -44,6 +44,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // ---- Error wrapper ----
 function asyncHandler(fn) {
   return async (req, res, next) => {
